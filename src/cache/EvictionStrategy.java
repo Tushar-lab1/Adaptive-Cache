@@ -1,5 +1,7 @@
 package cache;
 
-public class EvictionStrategy {
-    
+public interface EvictionStrategy {
+    void keyAccessed(int key);
+    int evictKey();
+    void removeKey(int key);
 }
