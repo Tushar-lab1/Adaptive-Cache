@@ -17,11 +17,31 @@ public class Cache {
     }
 
     public Integer get(int key) {
+        if(storage.containsKey(key)) {
+            metrics.recordHit();
+            strategy.keyAccessed(key);
+            return storage.get(key);
+        }
+        metrics.recordMiss();
         return null;
     }
 
     public void put(int key , int value) {
+        if(storage.containsKey(key)) {
+            storage.put(key , value);
+            strategy.keyAccessed(key);
+            metrics.recordHit();
+            return;
+        }
+        metrics.recordMiss();
+        if(storage.size() == capacity) {
+            int key_to_evict = strategy.evictKey();
+            storage.remove(key_to_evict);
+            strategy.removeKey(key_to_evict);
+        }
 
+        storage.put(key , value);
+        strategy.keyAccessed(key);
     }
 
     public void switchStrategy(EvictionStrategy newStrategy) {
