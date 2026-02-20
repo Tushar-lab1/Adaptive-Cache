@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Cache {
+    
     private final int capacity;
     private final Map<Integer , Integer> storage;
     private EvictionStrategy strategy;
@@ -45,6 +46,10 @@ public class Cache {
     }
 
     public void switchStrategy(EvictionStrategy newStrategy) {
+        newStrategy.rebuild(storage.keySet());
         this.strategy = newStrategy;
+
+        System.out.println("Strategy switched to : " + newStrategy.getClass().getSimpleName());
     }
+    
 }

@@ -41,6 +41,7 @@ public class LRUStrategy implements EvictionStrategy {
         if(nodeMap.containsKey(key)) {
             moveToFront(nodeMap.get(key));
         }
+
         else {
             Node node = new Node(key);
             nodeMap.put(key , node);
@@ -62,4 +63,18 @@ public class LRUStrategy implements EvictionStrategy {
             nodeMap.remove(key);
         }
     }
+
+    @Override
+    public void rebuild(Iterable<Integer> keys) {
+
+    nodeMap.clear();
+    head.next = tail;
+    tail.prev = head;
+
+    for (Integer key : keys) {
+        Node node = new Node(key);
+        nodeMap.put(key, node);
+        addFront(node);
+    }
+}
 }

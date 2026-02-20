@@ -22,4 +22,8 @@ public class MetricsTracker {
     public double hitRatio() {
         return totalRequests == 0 ? 0 : (double) hits/totalRequests;
     }
+
+    public double missRatio() {
+        return totalRequests == 0? 0 : (double) miss/totalRequests;
+    }
 }
