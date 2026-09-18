@@ -1,11 +1,11 @@
 package cache;
 
 public class Node {
-    int key;
+    String key;
     Node prev;
     Node next;
 
-    Node(int key) {
+    Node(String key) {
         this.key = key;
     }
 }

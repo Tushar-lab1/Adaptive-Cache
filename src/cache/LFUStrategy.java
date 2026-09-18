@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class LFUStrategy implements EvictionStrategy {
 
-    private final Map<Integer , Integer> keyToFreq;
-    private final Map<Integer , LinkedHashSet<Integer>> freqToKeys;
+    private final Map<String, Integer> keyToFreq;
+    private final Map<Integer , LinkedHashSet<String>> freqToKeys;
     private int minFreq;
 
     public LFUStrategy() {
@@ -16,7 +16,7 @@ public class LFUStrategy implements EvictionStrategy {
     }
 
     @Override
-    public void keyAccessed(int key) {
+    public void keyAccessed(String key) {
         if(!keyToFreq.containsKey(key)) {
             keyToFreq.put(key , 1);
             freqToKeys.computeIfAbsent(1, k -> new LinkedHashSet<>());
@@ -31,13 +31,13 @@ public class LFUStrategy implements EvictionStrategy {
         keyToFreq.put(key , newFreq);
 
         //Remove from old frequency set
-        LinkedHashSet<Integer> oldSet = freqToKeys.get(oldFreq);
-        oldSet.remove(oldFreq);
+        LinkedHashSet<String> oldSet = freqToKeys.get(oldFreq);
+        oldSet.remove(key);
 
         if(oldSet.isEmpty()) {
             freqToKeys.remove(oldFreq);
             if(minFreq == oldFreq) {
-                minFreq = oldFreq;
+                minFreq = newFreq;
             }
         }
 
@@ -45,8 +45,8 @@ public class LFUStrategy implements EvictionStrategy {
     }
 
     @Override
-    public int evictKey() {
-    LinkedHashSet<Integer> keys = freqToKeys.get(minFreq);
+    public String evictKey() {
+    LinkedHashSet<String> keys = freqToKeys.get(minFreq);
 
     if (keys == null || keys.isEmpty()) {
         throw new IllegalStateException(
@@ -58,10 +58,10 @@ public class LFUStrategy implements EvictionStrategy {
 }
 
     @Override
-    public void removeKey(int key) {
+    public void removeKey(String key) {
         Integer freq = keyToFreq.get(key);
         if(freq==null) return;
-        LinkedHashSet<Integer> keys = freqToKeys.get(freq);
+        LinkedHashSet<String> keys = freqToKeys.get(freq);
         keys.remove(key);
 
         if(keys.isEmpty()) {
@@ -75,13 +75,13 @@ public class LFUStrategy implements EvictionStrategy {
     }
 
     @Override
-public void rebuild(Iterable<Integer> keys) {
+public void rebuild(Iterable<String> keys) {
 
     keyToFreq.clear();
     freqToKeys.clear();
     minFreq = 0;
 
-    for (Integer key : keys) {
+    for (String key : keys) {
         keyToFreq.put(key, 1);
         freqToKeys
             .computeIfAbsent(1, k -> new LinkedHashSet<>())
